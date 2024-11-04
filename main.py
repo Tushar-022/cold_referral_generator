@@ -1,11 +1,22 @@
-
+import os
+import requests
+from bs4 import BeautifulSoup
 import streamlit as st
-from langchain_community.document_loaders import WebBaseLoader
-
-
 from chains import Chain
 from portfolio import Portfolio
 from utils import clean_text
+
+# Custom web loader function to replace WebBaseLoader
+def custom_web_loader(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+        soup = BeautifulSoup(response.text, 'html.parser')
+        page_content = soup.get_text(separator=" ")  # Extracts all text with space as separator
+        return page_content
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error fetching content: {e}")
+        return None
 
 def create_streamlit_app(llm, portfolio, clean_text):
     st.title("🤝🏻 Referral Request Generator")
@@ -14,15 +25,16 @@ def create_streamlit_app(llm, portfolio, clean_text):
 
     if submit_button:
         try:
-            loader = WebBaseLoader([url_input])
-            loaded_data = loader.load()
+            # Fetch data from the URL using the custom web loader
+            data = custom_web_loader(url_input)
             
             # Check if data is loaded
-            if not loaded_data:
+            if not data:
                 st.error("No content found at the provided URL.")
                 return
             
-            data = clean_text(loaded_data.pop().page_content)
+            # Clean the text using the provided clean_text function
+            data = clean_text(data)
             portfolio.load_portfolio()
             
             # Extract jobs and check if any jobs are found
@@ -47,6 +59,7 @@ def create_streamlit_app(llm, portfolio, clean_text):
             st.error(f"An Error Occurred: {e}")
 
 if __name__ == "__main__":
+    # Initialize instances of Chain and Portfolio
     chain = Chain()
     portfolio = Portfolio()
     st.set_page_config(layout="wide", page_title="Cold Referral Generator", page_icon="🤝🏻")
