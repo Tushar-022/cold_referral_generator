@@ -3,6 +3,7 @@
 ## Overview
 
 **Cold Referral Generator** is an end-to-end tool that generates personalized referral messages to enhance networking and outreach efforts. Built with **Llama 3.1** (an open-source Large Language Model), **ChromaDB** (vector store for efficient data retrieval), **LangChain** (for orchestrating LLM interactions), and **Streamlit** (for a user-friendly interface), this project automates the process of creating high-quality referral messages tailored to your contacts and context.
+![image](https://github.com/user-attachments/assets/60742d83-bf82-4699-a7fc-e8a265457b32)
 
 ## Installation
 
